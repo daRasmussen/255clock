@@ -10,3 +10,5 @@ tmp/nanoc/
 crash.log
 
 /env
+/.idea
+*/node_modules
