@@ -18,7 +18,6 @@ class App extends React.Component {
         break: 5,
         session: 25,
       },
-      reset: false,
       start_stop: false,
       time: '00:00',
     }
@@ -27,17 +26,24 @@ class App extends React.Component {
     this.up_and_down = this.up_and_down.bind(this);
   }
 
+
   start_stop(e) {
-    const { target: { value }} = e;
-    if(value === 'Start') {
-      e.target.value = 'Stop';
+    let { target: { innerText }} = e;
+    if(innerText === 'Start') {
+      innerText = 'Stop';
+      // start klock
     } else {
-      e.target.value = 'Start';
+      innerText = 'Start';
+      // stop clock
+      this.reset();
     }
   }
 
-  reset(e) {
-    const { target: { value }} = e;
+  reset() {
+    const { state: { length: { session }}} = this;
+    this.setState({
+      time: session + ':00',
+    });
   }
 
   up_and_down(e) {
