@@ -3,6 +3,8 @@ import React from 'react';
 
 class App extends React.Component {
 
+  static countDownHolder = null;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -19,6 +21,8 @@ class App extends React.Component {
         session: 25,
       },
       start_stop: false,
+      minutes: 0,
+      seconds: 0,
       time: '00:00',
     }
     this.start_stop = this.start_stop.bind(this);
@@ -26,16 +30,31 @@ class App extends React.Component {
     this.up_and_down = this.up_and_down.bind(this);
   }
 
+  countDown() {
+    let { state : { time }} = this;
+    const re = /(\d+):(\d+)/i
+    const fullTime = time.match(re)
+    let minutes = fullTime[1]
+    let seconds = fullTime[2]
+    App.countDownHolder = setInterval(function() {
+
+
+    }, 1000);
+  }
+
+  removeCount() {
+    clearInterval(App.countDownHolder)
+  }
 
   start_stop(e) {
     let { target: { innerText }} = e;
     if(innerText === 'Start') {
-      innerText = 'Stop';
-      // start klock
+      e.target.innerHTML = 'Pause'
+      this.countDown();
     } else {
-      innerText = 'Start';
       // stop clock
-      this.reset();
+      e.target.innerHTML = 'Start'
+      this.removeCount();
     }
   }
 
