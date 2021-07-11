@@ -18,7 +18,17 @@ class App extends React.Component {
       },
       length: {
         break: 5,
-        session: 10,
+        session: 25,
+        constraints: [
+          {
+            operator: '<=',
+            right: '0'
+          },
+          {
+            operator: '>',
+            right: '60'
+          }
+        ]
       },
       start_stop: false,
       time: '00:00',
@@ -41,6 +51,9 @@ class App extends React.Component {
         if(seconds === 0 || seconds === -60) {
           seconds = 0;
           minutes -= 1;
+          if (minutes <= 0) {
+            minutes = 0;
+          }
         }
         seconds--;
         update(minutes, seconds);
@@ -90,16 +103,40 @@ class App extends React.Component {
     });
   }
 
+  validate(value, constraints) {
+    const key = Object.keys(value)[0];
+    const target = value[key];
+    return constraints.some(
+        function (o) {
+          let left = `${'left' in o && key !== 'left' ? o.left : key === 'left' ? target : 'left'}`.trim()
+          let mid =   `${o.operator && key !== 'operator' ? o.operator : key === 'operator' ? target : ''}`.trim()
+          let right = `${'right' in o && key !== 'right'? o.right : key === 'right' ? target : 'right'}`.trim()
+          // eslint-disable-next-line no-eval
+          return eval(left + mid + right)
+        }
+    )
+  }
+
   up_and_down(e) {
     const { target: { id }} = e;
     const re = /(break|session)-(decrement|increment)/;
     const type = id.match(re)[1];
     const action = id.match(re)[2]
+
     const length = {};
     const second = Object.keys(this.state.length).filter(key => key !== type)[0];
     length[second] = this.state.length[second];
-    length[type] = parseInt(this.state.length[type], 10) + parseInt(this.state[action][type], 10)
+    const value = parseInt(this.state.length[type], 10) + parseInt(this.state[action][type], 10);
+    length[type] = value;
 
+    const c = this.state.length['constraints'];
+    const inValid = this.validate({left: value}, c)
+
+    if(inValid) {
+      length[type] = 0;
+    }
+
+    length['constraints'] = c;
     this.setState({
        length
     })
