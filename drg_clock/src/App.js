@@ -29,14 +29,14 @@ class App extends React.Component {
         session: 1,
       },
       length: {
-        break: 1, // 5
+        break: 2, // 5
         session: 1, // 25
       },
       start_stop: false,
-      mode: ["Session", "Break"],
-      active: "Session",
-      inActive: "Break",
-      time: '1:00', // 25
+      mode: ["session", "break"],
+      active: "session",
+      inActive: "break",
+      time: '00:00', // 25
       seconds: 0,
       minutes: 0
     }
@@ -49,30 +49,34 @@ class App extends React.Component {
 
   getTime() {
     let { state : { time }} = this;
-
     const re = /(\d+):(\d+)/i
     const fullTime = time.match(re)
     let minutes = parseInt(fullTime[1])
     let seconds = parseInt(fullTime[2])
+
     return {
       minutes,
       seconds
     }
   }
 
-
   toggleActive() {
     const { state: { mode, active, inActive }} = this
     this.setState({
       active: mode.filter((item) => item === inActive)[0],
       inActive: mode.filter((item) => item === active)[0],
-    })
-
+    });
   }
 
   countDown() {
     let { minutes, seconds } = this.getTime();
+    const { state: { length, active }} = this;
+    if(length[active] !== minutes) {
+      minutes = length[active]
+    }
+    seconds = 0;
     App.countDownHolder = setInterval(function() {
+      console.log(minutes)
         if(seconds === 0 || seconds === -60) {
           seconds = 0;
           minutes -= 1;
@@ -99,7 +103,7 @@ class App extends React.Component {
       }
 
       if(minutes === '00' && seconds === '00') {
-        this.toggleActive()
+        this.toggleActive();
       }
 
       this.setState({
@@ -167,7 +171,7 @@ class App extends React.Component {
       length[type] = 1;
     }
 
-    const time = `${length['session']}:00`
+    const time = this.state.active === 'Session' ? `${length['session']}:00` : `${length['break']}:00`
 
     this.setState({
        length,
@@ -198,7 +202,11 @@ class App extends React.Component {
               <button id="session-decrement" onClick={this.up_and_down}> Decrement  </button>
               <button id="session-increment" onClick={this.up_and_down}> Increment </button>
             </div>
-            <div id="timer-label">{this.state.active}</div>
+            <div id="timer-label">{
+              this.state.active.substring(0,1).toUpperCase()
+              +
+              this.state.active.substring(1,this.state.active.length)
+            }</div>
             <div id="time-left">{this.state.time}</div>
             <div className="Knappar">
               <button id="start_stop" onClick={this.start_stop}> Start </button>
