@@ -34,10 +34,8 @@ class App extends React.Component {
       },
       start_stop: false,
       time: '25:00',
-      currentTime: {
-        minutes: 25,
-        seconds: 0
-      }
+      seconds: 0,
+      minutes: 0
     }
     this.start_stop = this.start_stop.bind(this);
     this.reset = this.reset.bind(this);
@@ -45,14 +43,49 @@ class App extends React.Component {
     this.countDown = this.countDown.bind(this);
   }
 
-  countDown() {
+  getParsedTime(minutes, seconds) {
+    const initial = '00';
+    const zero = '0';
+    let mm = initial;
+    let ss = initial;
+
+    if(minutes === 0 || minutes === 60) {
+      mm = initial;
+    } else if (minutes < 10 && minutes > 0) {
+      mm = zero + minutes;
+    } else {
+      mm = minutes;
+    }
+    if(seconds === 0 || seconds === 60) {
+      ss = initial;
+    } else if (seconds < 10 && seconds > 0) {
+      ss = zero + minutes;
+    } else {
+      ss = seconds;
+    }
+
+    return {
+      minutes: mm,
+      seconds: ss,
+      time: `${mm}:${ss}`
+    };
+  }
+
+  getTime() {
     let { state : { time }} = this;
 
     const re = /(\d+):(\d+)/i
     const fullTime = time.match(re)
     let minutes = parseInt(fullTime[1])
     let seconds = parseInt(fullTime[2])
+    return {
+      minutes,
+      seconds
+    }
+  }
 
+  countDown() {
+    let { minutes, seconds } = this.getTime();
     App.countDownHolder = setInterval(function() {
         if(seconds === 0 || seconds === -60) {
           seconds = 0;
@@ -81,10 +114,6 @@ class App extends React.Component {
 
       this.setState({
         time: minutes + ':' + seconds,
-        currentTime: {
-          minutes,
-          seconds
-        }
       })
     }
 
@@ -149,9 +178,11 @@ class App extends React.Component {
       length[type] = 0;
     }
 
+    const { time } = this.getParsedTime(length['session'], this.getTime()["seconds"]);
     this.setState({
-       length
-    })
+       length,
+       time
+    });
   }
 
   render() {
