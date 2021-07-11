@@ -29,13 +29,14 @@ class App extends React.Component {
         session: 1,
       },
       length: {
-        break: 5,
-        session: 25,
+        break: 1, // 5
+        session: 1, // 25
       },
       start_stop: false,
-      active: 'Session',
-      inActive: 'Break',
-      time: '25:00',
+      mode: ["Session", "Break"],
+      active: "Session",
+      inActive: "Break",
+      time: '1:00', // 25
       seconds: 0,
       minutes: 0
     }
@@ -43,6 +44,7 @@ class App extends React.Component {
     this.reset = this.reset.bind(this);
     this.up_and_down = this.up_and_down.bind(this);
     this.countDown = this.countDown.bind(this);
+    this.toggleActive = this.toggleActive.bind(this);
   }
 
   getTime() {
@@ -56,6 +58,16 @@ class App extends React.Component {
       minutes,
       seconds
     }
+  }
+
+
+  toggleActive() {
+    const { state: { mode, active, inActive }} = this
+    this.setState({
+      active: mode.filter((item) => item === inActive)[0],
+      inActive: mode.filter((item) => item === active)[0],
+    })
+
   }
 
   countDown() {
@@ -86,8 +98,12 @@ class App extends React.Component {
         minutes = '0' + minutes;
       }
 
+      if(minutes === '00' && seconds === '00') {
+        this.toggleActive()
+      }
+
       this.setState({
-        time: minutes + ':' + seconds,
+        time: minutes + ':' + seconds
       })
     }
 
