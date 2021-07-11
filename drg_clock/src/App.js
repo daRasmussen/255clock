@@ -33,6 +33,8 @@ class App extends React.Component {
         session: 25,
       },
       start_stop: false,
+      active: 'Session',
+      inActive: 'Break',
       time: '25:00',
       seconds: 0,
       minutes: 0
@@ -41,34 +43,6 @@ class App extends React.Component {
     this.reset = this.reset.bind(this);
     this.up_and_down = this.up_and_down.bind(this);
     this.countDown = this.countDown.bind(this);
-  }
-
-  getParsedTime(minutes, seconds) {
-    const initial = '00';
-    const zero = '0';
-    let mm = initial;
-    let ss = initial;
-
-    if(minutes === 0 || minutes === 60) {
-      mm = initial;
-    } else if (minutes < 10 && minutes > 0) {
-      mm = zero + minutes;
-    } else {
-      mm = minutes;
-    }
-    if(seconds === 0 || seconds === 60) {
-      ss = initial;
-    } else if (seconds < 10 && seconds > 0) {
-      ss = zero + minutes;
-    } else {
-      ss = seconds;
-    }
-
-    return {
-      minutes: mm,
-      seconds: ss,
-      time: `${mm}:${ss}`
-    };
   }
 
   getTime() {
@@ -126,7 +100,7 @@ class App extends React.Component {
   start_stop(e) {
     let { target: { innerText }} = e;
     if(innerText === 'Start') {
-      e.target.innerHTML = 'Pause'
+      e.target.innerHTML = 'Stop'
       this.countDown();
     } else {
       // stop clock
@@ -173,15 +147,15 @@ class App extends React.Component {
     length[type] = value;
 
     const inValid = this.validate({left: value}, App.constraints['length'])
-
     if(inValid) {
-      length[type] = 0;
+      length[type] = 1;
     }
 
-    const { time } = this.getParsedTime(length['session'], this.getTime()["seconds"]);
+    const time = `${length['session']}:00`
+
     this.setState({
        length,
-       time
+        time
     });
   }
 
@@ -208,11 +182,12 @@ class App extends React.Component {
               <button id="session-decrement" onClick={this.up_and_down}> Decrement  </button>
               <button id="session-increment" onClick={this.up_and_down}> Increment </button>
             </div>
-            <div id="timer-label">Session</div>
+            <div id="timer-label">{this.state.active}</div>
             <div id="time-left">{this.state.time}</div>
             <div className="Knappar">
               <button id="start_stop" onClick={this.start_stop}> Start </button>
-              <button id="reset" onClick={this.reset} > Rest </button>
+              <button id="pause" onClick={this.pause}> Pause </button>
+              <button id="reset" onClick={this.reset} > Reset </button>
             </div>
             <code>drGeo</code>
           </header>
