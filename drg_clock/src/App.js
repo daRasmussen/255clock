@@ -4,6 +4,18 @@ import React from 'react';
 class App extends React.Component {
 
   static countDownHolder = null;
+  static constraints = {
+    length:[
+      {
+        operator: '<=',
+        right: '0'
+      },
+      {
+        operator: '>',
+        right: '60'
+      }
+    ]
+  }
 
   constructor(props) {
     super(props);
@@ -19,19 +31,13 @@ class App extends React.Component {
       length: {
         break: 5,
         session: 25,
-        constraints: [
-          {
-            operator: '<=',
-            right: '0'
-          },
-          {
-            operator: '>',
-            right: '60'
-          }
-        ]
       },
       start_stop: false,
-      time: '00:00',
+      time: '25:00',
+      currentTime: {
+        minutes: 25,
+        seconds: 0
+      }
     }
     this.start_stop = this.start_stop.bind(this);
     this.reset = this.reset.bind(this);
@@ -74,7 +80,11 @@ class App extends React.Component {
       }
 
       this.setState({
-        time: minutes + ':' + seconds
+        time: minutes + ':' + seconds,
+        currentTime: {
+          minutes,
+          seconds
+        }
       })
     }
 
@@ -97,9 +107,13 @@ class App extends React.Component {
   }
 
   reset() {
-    const { state: { length: { session }}} = this;
+    this.removeCount()
     this.setState({
-      time: session + ':00',
+      length: {
+        break: 5,
+        session: 25
+      },
+      time: 25 + ':00',
     });
   }
 
@@ -129,14 +143,12 @@ class App extends React.Component {
     const value = parseInt(this.state.length[type], 10) + parseInt(this.state[action][type], 10);
     length[type] = value;
 
-    const c = this.state.length['constraints'];
-    const inValid = this.validate({left: value}, c)
+    const inValid = this.validate({left: value}, App.constraints['length'])
 
     if(inValid) {
       length[type] = 0;
     }
 
-    length['constraints'] = c;
     this.setState({
        length
     })
