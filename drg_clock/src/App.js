@@ -18,28 +18,53 @@ class App extends React.Component {
       },
       length: {
         break: 5,
-        session: 25,
+        session: 10,
       },
       start_stop: false,
-      minutes: 0,
-      seconds: 0,
       time: '00:00',
     }
     this.start_stop = this.start_stop.bind(this);
     this.reset = this.reset.bind(this);
     this.up_and_down = this.up_and_down.bind(this);
+    this.countDown = this.countDown.bind(this);
   }
 
   countDown() {
     let { state : { time }} = this;
+
     const re = /(\d+):(\d+)/i
     const fullTime = time.match(re)
-    let minutes = fullTime[1]
-    let seconds = fullTime[2]
+    let minutes = parseInt(fullTime[1])
+    let seconds = parseInt(fullTime[2])
+
     App.countDownHolder = setInterval(function() {
-
-
+        if(seconds === 0 || seconds === -60) {
+          seconds = 0;
+          minutes -= 1;
+        }
+        seconds--;
+        update(minutes, seconds);
     }, 1000);
+
+    const update = (minutes, seconds) => {
+      const positive = 60 + seconds;
+      if(positive === 0 || positive === 60) {
+          seconds = '00';
+      } else if (positive > 0 && positive < 10) {
+         seconds = '0' + positive;
+      } else if (positive > 9 && positive < 60) {
+        seconds = positive;
+      }
+
+      if(minutes < 10) {
+        minutes = '0' + minutes;
+      }
+
+      this.setState({
+        time: minutes + ':' + seconds
+      })
+    }
+
   }
 
   removeCount() {

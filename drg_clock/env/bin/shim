@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+export NODE_PATH=/home/drgeo/github/255clock/drg_clock/env/lib/node_modules
+export NPM_CONFIG_PREFIX=/home/drgeo/github/255clock/drg_clock/env
+export npm_config_prefix=/home/drgeo/github/255clock/drg_clock/env
+exec env/bin/node "$@"
